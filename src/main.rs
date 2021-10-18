@@ -1,20 +1,26 @@
-use std::io;
+use std::fs::File;
+use std::io::prelude::*;
 
-fn fib(n: u64, first: u64, second: u64) -> u64 {
-    if n == 0 {
-        first
-    } else {
-        fib(n - 1, second, first + second)
-    }
+fn read_all(file : &mut File) -> String {
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).expect("Unable to read contents of file");
+    contents
 }
+fn catify(file : &String) {
+    let mut file = File::open(file).expect("Unable to open the file");
+    let contents = read_all(&mut file);
+    println!("Contents of file: {}", contents);
 
+}
 fn main() {
+    let args : Vec<String> = std::env::args().collect();
+   
+    if args.len() == 1 {
+        println!("Usage: {} <filename>", args[0]);
+        return 
+    }
 
-    let mut guess = String::new();
-    io::stdin()
-        .read_line(&mut guess)
-        .expect("Failed to read line");
-
-    let n = guess.trim().parse::<u64>().expect("Unable to parse number");
-    println!("fib({}) = {}", n, fib(n, 1, 1));
+    let filename = &args[1];
+    
+    catify(&filename);   
 }
