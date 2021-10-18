@@ -48,6 +48,7 @@ fn catify(filename: &String) {
     let mut result = String::new();
 
     for line in read_all(&mut file).split_inclusive('\n') {
+        // Lines that are empty, or that start with a '#', should be ignored
         if !found_title_line && line.len() > 1 && !line.starts_with('#') {
             found_title_line = true;
             result.push_str(sanitize(line));
