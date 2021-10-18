@@ -7,24 +7,35 @@ fn read_all(file: &mut File) -> String {
         .expect("Unable to read contents of file");
     contents
 }
+fn sanitize(line: &str) -> &str {
+    let endings = ["\n", " ", "🐈", "😌", "💅", "💕", "💖"];
+    let mut line = line;
+    loop {
+        let line2 = endings
+            .iter()
+            .fold(line, |line, ending| line.trim_end_matches(ending));
+        if line2.len() == line.len() {
+            break;
+        }
+        line = line2
+    }
+    line
+}
+
 fn catify(filename: &String) {
     let mut file = File::open(filename).expect("Unable to open the file");
-    let contents = read_all(&mut file);
-
-    let lines = contents.split_inclusive('\n');
 
     let mut found_title_line = false;
+    let mut result = String::new();
 
-    let oper = |acc, line: &str| -> String {
+    for line in read_all(&mut file).split_inclusive('\n') {
         if !found_title_line && line.len() > 1 && !line.starts_with('#') {
             found_title_line = true;
-            let result: String = acc + line;
-            result.replace('\n', " 🐈\n")
+            result.push_str(sanitize(line));
         } else {
-            acc + line
+            result.push_str(line);
         }
-    };
-    let result = lines.fold(String::new(), oper);
+    }
 
     std::fs::OpenOptions::new()
         .truncate(true)
