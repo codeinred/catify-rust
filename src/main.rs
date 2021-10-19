@@ -2,11 +2,10 @@ use rand::Rng;
 use std::fs::File;
 use std::io::prelude::*;
 
-fn read_all(file: &mut File) -> String {
+fn read_all(file: &mut File) -> Result<String, std::io::Error> {
     let mut contents = String::new();
-    file.read_to_string(&mut contents)
-        .expect("Unable to read contents of file");
-    contents
+    file.read_to_string(&mut contents)?;
+    Ok(contents)
 }
 
 // Strip any existing spaces, newlines, or emoji endings.
@@ -41,13 +40,13 @@ fn emote(str: &mut String) {
     str.push('\n');
 }
 
-fn catify(filename: &String) {
-    let mut file = File::open(filename).expect("Unable to open the file");
+fn catify(filename: &String) -> Result<(), std::io::Error> {
+    let mut file = File::open(filename)?;
 
     let mut found_title_line = false;
     let mut result = String::new();
 
-    for line in read_all(&mut file).split_inclusive('\n') {
+    for line in read_all(&mut file)?.split_inclusive('\n') {
         // Lines that are empty, or that start with a '#', should be ignored
         if !found_title_line && line.len() > 1 && !line.starts_with('#') {
             found_title_line = true;
@@ -61,10 +60,10 @@ fn catify(filename: &String) {
     std::fs::OpenOptions::new()
         .truncate(true)
         .write(true)
-        .open(filename)
-        .expect("Able to open file")
-        .write_all(result.as_bytes())
-        .expect("I just wanted to write to this file :(");
+        .open(filename)?
+        .write_all(result.as_bytes())?;
+
+    Ok(())
 }
 fn main() {
     let args: Vec<String> = std::env::args().collect();
@@ -76,5 +75,14 @@ fn main() {
 
     let filename = &args[1];
 
-    catify(&filename);
+    match catify(&filename) {
+        Ok(_) => (),
+        Err(err) => {
+            println!(
+                "Catify encountered error when processing '{}': {}",
+                filename, err
+            );
+            std::process::exit(1);
+        }
+    }
 }
