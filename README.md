@@ -16,13 +16,13 @@ And then, you can create a link to whatever directory you've selected to store
 your git hooks. This could mean adding it as a hook to a particular project:
 
 ```bash
-ln $CARGO_HOME/bin/catify-rust .git/hooks/prepare-commit-message
+ln $CARGO_HOME/bin/catify-rust .git/hooks/prepare-commit-msg
 ```
 
 Or placing it as a hook to a directory that stores global git hooks:
 
 ```bash
-ln $CARGO_HOME/bin/catify-rust ~/.local/git-hooks/prepare-commit-message
+ln $CARGO_HOME/bin/catify-rust ~/.local/git-hooks/prepare-commit-msg
 ```
 
 Here, I've selected `~/.local/git-hooks` as my git hooks repository, however you
